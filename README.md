@@ -1,100 +1,250 @@
 # Geometric Shapes CNN – 210152
 
-CNN image classification project for triangles, squares, and circles, implemented in PyTorch and trained on a custom geometric shapes dataset plus real-world phone photos. [file:1]
+This project implements a Convolutional Neural Network (CNN) in PyTorch to classify **geometric shapes** (circles, squares, triangles) and test the model on real-world drawings captured with a smartphone, following the assignment specification. [file:1]
 
 ---
 
-## Dataset
+## 1. Project overview
 
-- **Main training data**: Hand‑drawn geometric shapes in three classes: **circles, squares, triangles**.  
-- Directory structure inside the repo:
-
-  - `data/train/circles`, `data/train/squares`, `data/train/triangles`  
-  - `data/val/circles`, `data/val/squares`, `data/val/triangles`  
-  - `data/test/circles`, `data/test/squares`, `data/test/triangles`  
-
-- **Custom phone dataset** (real‑world test):
-
-  - 10 smartphone photos stored in `dataset/` (mix of circles, squares, triangles drawn on paper). [file:1]
-
-All images are converted to grayscale and resized to **64×64** pixels, then normalized with mean 0.5 and std 0.5 using `torchvision.transforms`. [file:1]
+- **Task**: 3‑class image classification – circles, squares, triangles. [file:1]  
+- **Framework**: PyTorch + torchvision. [file:1]  
+- **Environment**: Google Colab notebook that fully automates cloning the repo, training, evaluating, and testing on custom phone images. [file:1]  
+- **Goal**: Bridge training on a prepared shapes dataset with testing on 10 real photos of hand‑drawn shapes. [file:1]
 
 ---
 
-## Model architecture
+## 2. Dataset
 
-Implemented in `CNN` class (`torch.nn.Module`):
+### 2.1 Main shapes dataset
 
-- Input: \(1 \times 64 \times 64\) grayscale images.  
-- Feature extractor:
+The main dataset consists of hand‑drawn or digitally created geometric shapes organized into three classes:
 
-  - Conv2d(1, 32, kernel=3, padding=1) + ReLU + MaxPool2d(2)  
-  - Conv2d(32, 64, kernel=3, padding=1) + ReLU + MaxPool2d(2)  
-  - Conv2d(64, 128, kernel=3, padding=1) + ReLU + MaxPool2d(2)  
+- `circles`  
+- `squares`  
+- `triangles`  
 
-- Classifier:
+Folder structure inside the repository:
+
+data/
+train/
+circles/
+squares/
+triangles/
+val/
+circles/
+squares/
+triangles/
+test/
+circles/
+squares/
+triangles/
+
+text
+
+All images are converted to **grayscale** and resized to **64×64** pixels, then normalized with mean 0.5 and std 0.5 using `torchvision.transforms`. [file:1]
+
+### 2.2 Custom phone dataset
+
+To satisfy the “phone” requirement, 10 smartphone photos of hand‑drawn shapes on paper are stored in:
+
+dataset/
+circle1.jpeg
+circle2.jpeg
+circle3.jpeg
+square1.jpeg
+square2.jpeg
+square3.jpeg
+square4.jpeg
+triangle1.jpeg
+triangle2.jpeg
+triangle3.jpeg
+
+text
+
+These images are also converted to grayscale, resized to 64×64, and normalized with the same transform pipeline as the training data. [file:1]
+
+---
+
+## 3. Model architecture
+
+The CNN is implemented as a `torch.nn.Module` named **CNN** with the following structure:
+
+- **Input**: Grayscale images of shape \(1 \times 64 \times 64\).  
+- **Feature extractor**:
+
+  - Conv2d(1, 32, kernel_size=3, padding=1) → ReLU → MaxPool2d(2)  
+  - Conv2d(32, 64, kernel_size=3, padding=1) → ReLU → MaxPool2d(2)  
+  - Conv2d(64, 128, kernel_size=3, padding=1) → ReLU → MaxPool2d(2)
+
+- **Classifier**:
 
   - Flatten  
-  - Linear(128×8×8 → 256) + ReLU  
-  - Linear(256 → 3) for the three shape classes. [file:1]
+  - Linear(128×8×8 → 256) → ReLU  
+  - Linear(256 → 3) for the three classes.  
 
-Loss function is **CrossEntropyLoss**, optimizer is **Adam** with learning rate 0.001, trained for **15 epochs** with batch size 64. [file:1]
+Loss and optimizer:
 
----
-
-## Training procedure
-
-The Colab notebook:
-
-1. Uses `!git clone https://github.com/Heaven-Bro/210152_cnn.git` to automatically download the repo and data. [file:1]  
-2. Loads training/validation/test sets via `torchvision.datasets.ImageFolder` and `DataLoader`. [file:1]  
-3. Trains the CNN for 15 epochs, tracking **loss** and **accuracy** on both training and validation sets.  
-4. Saves the trained weights to `model/210152.pth` using `torch.save(model.state_dict(), ...)`. [file:1]
-
-### Training results
-
-- Final **training** accuracy ≈ **84%**, validation accuracy ≈ **88%** on the geometric shapes dataset.  
-- Loss decreased from about **1.17** to **0.40** (train) and **0.32** (val), showing good convergence.  
-
-The notebook includes plots of **Loss vs Epochs** and **Accuracy vs Epochs** for both training and validation, as required. [file:1]
+- **Loss**: `nn.CrossEntropyLoss`  
+- **Optimizer**: `torch.optim.Adam` with learning rate 0.001  
+- **Batch size**: 64  
+- **Epochs**: 15 [file:1]
 
 ---
 
-## Evaluation and visuals
+## 4. Training pipeline
 
-The notebook generates the following visual outputs: [file:1]
+The notebook performs a full end‑to‑end pipeline:
 
-1. **Confusion Matrix** on the test set  
-   - Diagonal entries are high for all three classes.  
-   - Most errors are circles misclassified as triangles or squares.
+1. **Automatic cloning**
 
-2. **Misclassified examples**  
-   - Shows 3 test images where the model predicted the wrong class, with titles like  
-     `True: circles, Pred: squares`.
+!git clone https://github.com/Heaven-Bro/210152_cnn.git
+%cd 210152_cnn
 
-3. **Custom Prediction Gallery (phone images)**  
-   - Loads all images from `dataset/`.  
-   - Applies the same transforms as training (grayscale, resize, normalize).  
-   - Runs them through the model in `eval()` mode and uses `torch.softmax` to get probabilities.  
-   - Displays a grid of the 10 photos with titles `Pred: <class> (<confidence>%)`. [file:1]
+text
 
-Example predictions:
+This satisfies the assignment requirement that all data and code are pulled automatically from the repository. [file:1]
 
-- Some triangles and squares are classified correctly with confidence above **99%**.  
-- A few circle/square drawings are misclassified as triangles, which is discussed in the error analysis. [file:1]
+2. **Data loading**
+
+- Uses `torchvision.datasets.ImageFolder` for `data/train`, `data/val`, and `data/test`.  
+- Wraps datasets in `DataLoader` objects with `batch_size=64`. [file:1]
+
+3. **Training loop**
+
+- For each epoch:
+
+  - Forward pass on training batches.  
+  - Compute cross‑entropy loss.  
+  - Backpropagate (`loss.backward()`) and update weights (`optimizer.step()`).  
+  - Track running loss and accuracy.  
+
+- After each epoch, evaluates on the validation set with `model.eval()` and `torch.no_grad()` and stores validation loss/accuracy. [file:1]
+
+4. **Saving the model**
+
+After training, the model weights are saved as a state dictionary:
+
+os.makedirs("model", exist_ok=True)
+torch.save(model.state_dict(), "model/210152.pth")
+
+text
+
+This file is committed to the `model/` directory in the repo for later loading. [file:1]
 
 ---
 
-## How to run (Colab)
+## 5. Results
 
-1. Open the Colab notebook (link provided in submission).  
+### 5.1 Training and validation curves
+
+- **Loss** decreases from roughly **1.17 → 0.40** on the training set and **1.10 → 0.32** on the validation set over 15 epochs, showing stable convergence.  
+- **Accuracy** increases from about **33% → 84%** (train) and **33% → 88%** (validation).  
+
+Example plots (paths are examples; update to your actual filenames):
+
+![Loss vs Epochs](plots/lossplots/accuracy_vs_epochs.png to show training history for loss and accuracy on both training and validation sets. [file:1]
+
+5.2 Confusion matrix on test set
+A confusion matrix is computed using predictions on data/test:
+
+High correct counts on the diagonal for all three classes.
+
+Most errors occur between circles and triangles, which can appear visually similar in some hand‑drawn samples.
+
+Example image:
+
+text
+![Confusion Matrix](plots/confent requirement for a confusion matrix heatmap. [file:1]
+
+### 5.3 Visual error analysis
+
+From the test set, three misclassified images are selected and displayed with their true and predicted labels, such as:
+
+- `True: circles, Pred: squares`  
+- `True: circles, Pred: squares`  
+- `True: circles, Pred: squares`  
+
+Example image:
+
+![Misclassified Examples](plots/misclassified_examples” requirement. [file:1]
+
+6. Real‑world prediction (phone images)
+The notebook loads all images from dataset/, applies the same preprocessing, and uses the saved model in evaluation mode:
+
+loaded_model = CNN().to(device)
+
+loaded_model.load_state_dict(torch.load("model/210152.pth", map_location=device))
+
+loaded_model.eval()
+
+For each phone image:
+
+Load with PIL.Image.open(path).convert("L").
+
+Apply test_transform (resize → tensor → normalize).
+
+Run through the model, then apply torch.softmax to get probabilities.
+
+Take the argmax as the predicted class and report confidence in percent. [file:1]
+
+Example console output:
+
+text
+dataset/circle1.jpeg -> triangles (99.89%)
+dataset/circle2.jpeg -> triangles (100.00%)
+dataset/circle3.jpeg -> squares (99.16%)
+dataset/square1.jpeg -> triangles (100.00%)
+dataset/square2.jpeg -> triangles (92.99%)
+dataset/square3.jpeg -> circles (62.82%)
+dataset/square4.jpeg -> triangles (42.50%)
+dataset/triangle1.jpeg -> triangles (99.61%)
+dataset/triangle2.jpeg -> triangles (99.99%)
+dataset/triangle3.jpeg -> triangles (98.66%)
+A prediction gallery visualizes these results in a 2×5 (or similar) grid:
+
+text
+![Phone Image Predictions](plots/phone_predictions.png with a title like `Pred: triangles (99.9%)`, fulfilling the “Custom Prediction Gallery” requirement. [file:1]
+
+---
+
+## 7. How to run the notebook
+
+1. Open the Colab notebook linked in the assignment submission.  
 2. Click **Runtime → Run all**.  
 3. The notebook will automatically:
 
-   - Clone this repository.  
+   - Clone this GitHub repository.  
    - Load the geometric shapes dataset from `data/`.  
-   - Train the CNN (or load `model/210152.pth` if already saved).  
-   - Evaluate on the test set and show the confusion matrix and misclassified samples.  
-   - Load the 10 phone images from `dataset/` and output predictions plus the gallery. [file:1]
+   - Train the CNN (or load `model/210152.pth` if training has already been done).  
+   - Evaluate on the standard test set and display the confusion matrix and misclassified examples.  
+   - Load the 10 smartphone images from `dataset/`, output the predicted class and confidence for each, and display the prediction gallery. [file:1]
 
-No manual uploads or path changes are required; everything runs end‑to‑end from the GitHub repo as specified in the assignment. [file:1]
+No manual file uploads or path changes are needed; the pipeline is fully automated as required. [file:1]
+
+---
+
+## 8. Repository structure
+
+210152_cnn/
+data/
+train/...
+val/...
+test/...
+dataset/
+circle1.jpeg
+...
+triangle3.jpeg
+model/
+210152.pth
+210152_cnn.ipynb # Colab-ready notebook
+README.md # This file
+plots/
+loss_vs_epochs.png
+accuracy_vs_epochs.png
+confusion_matrix.png
+misclassified_examples.png
+phone_predictions.png
+
+text
+
+This structure follows the assignment instructions for GitHub hosting, reproducibility, and automated data/model loading. [file:1]
