@@ -1,0 +1,8 @@
+# after training
+os.makedirs("model", exist_ok=True)
+torch.save(model.state_dict(), "model/210152.pth")   # creates the file on disk
+
+# later, for loading
+loaded_model = CNN().to(device)
+loaded_model.load_state_dict(torch.load("model/210152.pth", map_location=device))
+loaded_model.eval()
