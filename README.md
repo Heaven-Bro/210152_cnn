@@ -7,15 +7,13 @@ CNN image classification project for triangles, squares, and circles, implemente
 ## Dataset
 
 - **Main training data**: Hand‑drawn geometric shapes in three classes: **circles, squares, triangles**.  
-- Directory structure inside the repo:
+- Directory structure:
 
   - `data/train/circles`, `data/train/squares`, `data/train/triangles`  
   - `data/val/circles`, `data/val/squares`, `data/val/triangles`  
   - `data/test/circles`, `data/test/squares`, `data/test/triangles`  
 
-- **Custom phone dataset** (real‑world test):
-
-  - 10 smartphone photos stored in `dataset/` (mix of circles, squares, triangles drawn on paper). [file:1]
+- **Custom phone dataset** (real‑world test): 10 smartphone photos stored in `dataset/` (mix of circles, squares, triangles drawn on paper). [file:1]
 
 All images are converted to grayscale and resized to **64×64** pixels, then normalized with mean 0.5 and std 0.5 using `torchvision.transforms`. [file:1]
 
@@ -27,13 +25,10 @@ Implemented in `CNN` class (`torch.nn.Module`):
 
 - Input: \(1 \times 64 \times 64\) grayscale images.  
 - Feature extractor:
-
   - Conv2d(1, 32, kernel=3, padding=1) + ReLU + MaxPool2d(2)  
   - Conv2d(32, 64, kernel=3, padding=1) + ReLU + MaxPool2d(2)  
   - Conv2d(64, 128, kernel=3, padding=1) + ReLU + MaxPool2d(2)  
-
 - Classifier:
-
   - Flatten  
   - Linear(128×8×8 → 256) + ReLU  
   - Linear(256 → 3) for the three shape classes. [file:1]
@@ -51,26 +46,32 @@ The Colab notebook:
 3. Trains the CNN for 15 epochs, tracking **loss** and **accuracy** on both training and validation sets.  
 4. Saves the trained weights to `model/210152.pth` using `torch.save(model.state_dict(), ...)`. [file:1]
 
-### Training results
+---
 
-- Final **training** accuracy ≈ **84%**, validation accuracy ≈ **88%** on the geometric shapes dataset.  
-- Loss decreased from about **1.17** to **0.40** (train) and **0.32** (val), showing good convergence.  
+## Results
 
-The notebook includes plots of **Loss vs Epochs** and **Accuracy vs Epochs** for both training and validation, as required. [file:1]
+- Final **training accuracy** ≈ **84%**, **validation accuracy** ≈ **88%** on the shapes dataset.  
+- Training loss decreases from about **1.17 → 0.40**, validation loss from **1.10 → 0.32**, showing good convergence. [file:49][file:50]  
+- Confusion matrix shows high correct counts for all three classes, with most mistakes between circles and triangles. [file:52]  
+- On the 10 phone images, most triangles and squares are predicted correctly with confidence above **99%**, while a few circle/square drawings are misclassified as triangles. [file:53]
+
+The notebook includes plots of **Loss vs Epochs**, **Accuracy vs Epochs**, the **confusion matrix**, misclassified examples, and the **phone prediction gallery**. [file:49][file:50][file:51][file:52][file:53]
 
 ---
 
 ## Evaluation and visuals
 
-The notebook generates the following visual outputs: [file:1]
-
 1. **Confusion Matrix** on the test set  
    - Diagonal entries are high for all three classes.  
    - Most errors are circles misclassified as triangles or squares.
 
+   ![Confusion Matrix](https://github.com/user-attachments/assets/22c1d433-dca7-404e-8ea8-b293299cc1b4)
+
 2. **Misclassified examples**  
    - Shows 3 test images where the model predicted the wrong class, with titles like  
      `True: circles, Pred: squares`.
+
+   ![Misclassified Examples](https://github.com/user-attachments/assets/bd496cfc-7e54-4181-a4e5-46eac5a28757)
 
 3. **Custom Prediction Gallery (phone images)**  
    - Loads all images from `dataset/`.  
@@ -78,10 +79,12 @@ The notebook generates the following visual outputs: [file:1]
    - Runs them through the model in `eval()` mode and uses `torch.softmax` to get probabilities.  
    - Displays a grid of the 10 photos with titles `Pred: <class> (<confidence>%)`. [file:1]
 
+   ![Phone Prediction Gallery](https://github.com/user-attachments/assets/c54ea116-7a98-4633-ae71-1b6c96a227a4)
+
 Example predictions:
 
 - Some triangles and squares are classified correctly with confidence above **99%**.  
-- A few circle/square drawings are misclassified as triangles, which is discussed in the error analysis. [file:1]
+- A few circle/square drawings are misclassified as triangles, which is discussed in the error analysis. [file:53]
 
 ---
 
@@ -95,6 +98,6 @@ Example predictions:
    - Load the geometric shapes dataset from `data/`.  
    - Train the CNN (or load `model/210152.pth` if already saved).  
    - Evaluate on the test set and show the confusion matrix and misclassified samples.  
-   - Load the 10 phone images from `dataset/` and output predictions plus the gallery. [file:1]
+   - Load the 10 phone images from `dataset/` and output the predictions plus the gallery. [file:1]
 
 No manual uploads or path changes are required; everything runs end‑to‑end from the GitHub repo as specified in the assignment. [file:1]
